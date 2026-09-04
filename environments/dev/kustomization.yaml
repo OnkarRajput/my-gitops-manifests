@@ -1,12 +1,5 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-
-# Inherit the deployment.yaml and service.yaml from the base directory
 resources:
-  - ../../base
-
-# Modify the image tag configuration cleanly
-images:
-  - name: docker.io/placeholder/devsecops-app
-    newName: onkarrajput/devsecops-app
-    newTag: latest
+  - deployment.yaml
+  - service.yaml
