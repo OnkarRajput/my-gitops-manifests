@@ -1,20 +1,10 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: enterprise-app
-  namespace: default
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: enterprise-web
-  template:
-    metadata:
-      labels:
-        app: enterprise-web
-    spec:
-      containers:
-      - name: web-container
-        image: docker.io/placeholder/devsecops-app:latest
-        ports:
-        - containerPort: 80
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+images:
+  - name: docker.io/placeholder/devsecops-app
+    newName: onkarrajput/devsecops-app  # Replace with your actual Docker Hub username if different
+    newTag: latest
