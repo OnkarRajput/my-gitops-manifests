@@ -3,11 +3,10 @@ kind: Kustomization
 
 # Correct field mapping to track your base files
 resources:
-  - ../../base
+- ../../base
 
 # Replaces the generic container reference with your personal repository tag
 images:
-  - name: docker.io/placeholder/devsecops-app
-    newName: onkarrajput/devsecops-app
-    newTag: latest
-    
+- name: docker.io/placeholder/devsecops-app
+  newName: onkarrajput/devsecops-app
+  newTag: 91df49f64564262ab2feeeb31041550d03e2cb62
