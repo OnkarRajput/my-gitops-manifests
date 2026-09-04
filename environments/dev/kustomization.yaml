@@ -1,8 +1,12 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-bases:
+
+# Correct field mapping to track your base files
+resources:
   - ../../base
+
+# Replaces the generic container reference with your personal repository tag
 images:
   - name: docker.io/placeholder/devsecops-app
-    newName: YOUR_DOCKERHUB_USERNAME/devsecops-app  # Replace with your Docker Hub username
+    newName: onkarrajput/devsecops-app
     newTag: latest
