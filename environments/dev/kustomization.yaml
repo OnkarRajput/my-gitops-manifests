@@ -1,5 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-resources:
-  - deployment.yaml
-  - service.yaml
+bases:
+  - ../../base
+images:
+  - name: docker.io/placeholder/devsecops-app
+    newName: YOUR_DOCKERHUB_USERNAME/devsecops-app  # Replace with your Docker Hub username
+    newTag: latest
