@@ -9,4 +9,4 @@ resources:
 images:
 - name: docker.io/placeholder/devsecops-app
   newName: onkarrajput/devsecops-app
-  newTag: ca9ceed89e9bfbc5a11146ba7c1dc2eeb9e0f5d8
+  newTag: 588403df917de097922bd9b83ad04895134d532e
