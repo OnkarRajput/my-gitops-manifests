@@ -4,6 +4,7 @@ namespace: observability
 resources:
   - namespace.yaml
   - prometheus.yaml
+  - loki.yaml
   - grafana.yaml
   - fluent-bit.yaml
   - waf-ingress.yaml
