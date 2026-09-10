@@ -4,6 +4,7 @@ kind: Kustomization
 # Tells Kustomize to inherit the core deployment and service from the base folder
 resources:
   - ../../base
+  - ../../base/observability
 
 # Overwrites the image reference dynamically
 images:
