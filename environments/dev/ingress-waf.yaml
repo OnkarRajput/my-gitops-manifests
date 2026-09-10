@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ingress-nginx-controller
+  namespace: ingress-nginx
+data:
+  enable-modsecurity: "true"
+  enable-owasp-modsecurity-crs: "true"
+  enable-vts-status: "true"                # Enables traffic status data
+  prometheus-metrics: "true"               # Exposes NGINX metrics for Prometheus
+  # Configures ModSecurity to log to stdout so Fluent Bit can read it instantly
+  modsecurity-snippet: |
+    SecRuleEngine On
+    SecAuditEngine RelevantOnly
+    SecAuditLogParts ABIJDEFHZ
+    SecAuditLogType Serial
+    SecAuditLog /dev/stdout
