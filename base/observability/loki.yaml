@@ -9,12 +9,26 @@ data:
   local-config.yaml: |
     auth_enabled: false
     
+    common:
+      path_prefix: /loki
+      replication_factor: 1
+      storage:
+        s3:
+          s3: null
+          endpoint: null
+          region: null
+          access_key_id: null
+          secret_access_key: null
+        filesystem:
+          directory: /loki/chunks
+    
     ingester:
       chunk_idle_period: 3m
       max_chunk_age: 1h
       chunk_encoding: gzip
     
     limits_config:
+      allow_structured_metadata: false
       reject_old_samples: true
       reject_old_samples_max_age: 168h
     
@@ -23,7 +37,10 @@ data:
       - from: 2020-10-24
         store: tsdb
         object_store: filesystem
-        schema: v12
+        schema: v13
+        index:
+          prefix: index_
+          period: 24h
     
     server:
       http_listen_port: 3100
@@ -35,6 +52,11 @@ data:
         cache_location: /loki/tsdb-cache
       filesystem:
         directory: /loki/chunks
+    
+    compactor:
+      working_directory: /loki/compactor
+      compaction_interval: 10m
+      shared_store: filesystem
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -92,7 +114,7 @@ spec:
             memory: 512Mi
         securityContext:
           allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
+          readOnlyRootFilesystem: false
           capabilities:
             drop:
             - ALL
