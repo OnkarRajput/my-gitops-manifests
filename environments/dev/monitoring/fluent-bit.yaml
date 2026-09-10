@@ -46,12 +46,28 @@ spec:
         - name: varlibdockercontainers
           mountPath: /var/lib/docker/containers
           readOnly: true
+        - name: fluent-bit-config
+          mountPath: /fluent-bit/etc/
+        - name: flb-storage
+          mountPath: /var/log/flb-storage
         resources:
           limits:
             memory: 512Mi
           requests:
             cpu: 100m
             memory: 128Mi
+        livenessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 2020
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 2020
+          initialDelaySeconds: 10
+          periodSeconds: 5
       volumes:
       - name: varlog
         hostPath:
@@ -61,6 +77,13 @@ spec:
         hostPath:
           path: /var/lib/docker/containers
           type: Directory
+      - name: fluent-bit-config
+        configMap:
+          name: fluent-bit-config
+      - name: flb-storage
+        hostPath:
+          path: /var/log/flb-storage
+          type: DirectoryOrCreate
       tolerations:
       - operator: Exists
         effect: NoSchedule
@@ -74,3 +97,32 @@ metadata:
   namespace: observability
   annotations:
     argocd.argoproj.io/sync-wave: "0"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: fluent-bit
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+rules:
+- apiGroups: [""]
+  resources:
+  - namespaces
+  - pods
+  - pods/logs
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: fluent-bit
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: fluent-bit
+subjects:
+- kind: ServiceAccount
+  name: fluent-bit
+  namespace: observability
