@@ -12,14 +12,12 @@ data:
     ingester:
       chunk_idle_period: 3m
       max_chunk_age: 1h
-      max_streams_limit_per_user: 10000
       chunk_encoding: gzip
     
     limits_config:
+      max_streams_limit_per_user: 10000
       reject_old_samples: true
       reject_old_samples_max_age: 168h
-      ingestion_rate_mb: 10
-      ingestion_burst_size_mb: 20
     
     schema_config:
       configs:
