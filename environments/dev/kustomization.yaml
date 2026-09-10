@@ -1,13 +1,13 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-# Tells Kustomize to inherit the core deployment and service from the base folder
+# Correct field mapping to track your base files
 resources:
   - ../../base
   - ../../base/observability
 
-# Overwrites the image reference dynamically
+# Replaces the generic container reference with your personal repository tag
 images:
-  - name: docker.io/placeholder/devsecops-app
-    newName: onkarrajput/devsecops-app  # ◄ Replace "onkarrajput" with your actual Docker Hub username
-    newTag: latest                      # ◄ The pipeline will automatically overwrite this tag
+- name: docker.io/placeholder/devsecops-app
+  newName: onkarrajput/devsecops-app
+  newTag: faa0a9427fd7df18e7f794953ce6e5c7b05fe04d
