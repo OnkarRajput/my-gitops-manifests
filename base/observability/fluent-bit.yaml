@@ -37,13 +37,19 @@ data:
         Flush         1
         Log_Level     info
         Parsers_File  parsers.conf
+        Parsers_File  custom_parsers.conf
+
     [INPUT]
         Name              tail
         Path              /var/log/containers/*.log
         Parser            cri
+        Parser            docker
         Tag               kube.*
         Mem_Buf_Limit     10MB
         Skip_Long_Lines   On
+        Refresh_Interval  10
+        Skip_Empty_Lines  On
+
     [FILTER]
         Name                kubernetes
         Match               kube.*
@@ -51,9 +57,24 @@ data:
         Keep_Log            Off
         K8S-Logging.Parser  On
         K8S-Logging.Exclude On
+        Labels              On
+        Annotations         On
+
+    [FILTER]
+        Name              modify
+        Match             kube.*
+        Add               cluster minikube
+        Add               environment production
+
     [OUTPUT]
-        Name   stdout
-        Match  *
+        Name                 loki
+        Match                *
+        host                 loki
+        port                 3100
+        labels               job=fluent-bit,cluster=minikube,node=${HOSTNAME}
+        auto_kubernetes_labels on
+        label_keys           kubernetes_namespace_name,kubernetes_pod_name,kubernetes_container_name
+
   parsers.conf: |
     [PARSER]
         Name        cri
@@ -61,6 +82,21 @@ data:
         Regex       ^(?<time>[^ ]+) (?<stream>stdout|stderr) (?<logtag>[^ ]*) (?<message>.*)$
         Time_Key    time
         Time_Format %Y-%m-%dT%H:%M:%S.%L%z
+
+    [PARSER]
+        Name        docker
+        Format      json
+        Time_Key    time
+        Time_Format %Y-%m-%dT%H:%M:%S.%L%z
+        Time_Keep   On
+
+  custom_parsers.conf: |
+    [PARSER]
+        Name        json
+        Format      json
+        Time_Key    timestamp
+        Time_Format %Y-%m-%dT%H:%M:%S.%L%z
+        Time_Keep   On
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -87,6 +123,12 @@ spec:
       containers:
         - name: fluent-bit
           image: fluent/fluent-bit:3.1.7-arm64
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
           securityContext:
             privileged: true
             runAsUser: 0
@@ -106,6 +148,17 @@ spec:
             - name: containers
               mountPath: /var/lib/docker/containers
               readOnly: true
+            - name: systemd
+              mountPath: /var/log/journal
+              readOnly: true
+          livenessProbe:
+            exec:
+              command:
+              - /fluent-bit/bin/fluent-bit
+              - -c
+              - /fluent-bit/etc/fluent-bit.conf
+            initialDelaySeconds: 30
+            periodSeconds: 10
       volumes:
         - name: config
           configMap:
@@ -115,4 +168,10 @@ spec:
             path: /var/log
             type: Directory
         - name: containers
-          emptyDir: {}
+          hostPath:
+            path: /var/lib/docker/containers
+            type: Directory
+        - name: systemd
+          hostPath:
+            path: /var/log/journal
+            type: Directory
