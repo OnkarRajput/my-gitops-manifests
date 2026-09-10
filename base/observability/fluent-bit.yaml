@@ -86,7 +86,7 @@ spec:
         - operator: Exists
       containers:
         - name: fluent-bit
-          image: fluent/fluent-bit:3.1.7
+          image: fluent/fluent-bit:3.1.7-arm64
           securityContext:
             privileged: true
             runAsUser: 0
@@ -115,6 +115,4 @@ spec:
             path: /var/log
             type: Directory
         - name: containers
-          hostPath:
-            path: /var/lib/docker/containers
-            type: Directory
+          emptyDir: {}
