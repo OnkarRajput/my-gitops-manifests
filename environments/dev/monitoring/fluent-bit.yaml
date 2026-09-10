@@ -6,8 +6,11 @@ metadata:
     argocd.argoproj.io/sync-wave: "-1"
   labels:
     pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/enforce-version: latest
     pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/audit-version: latest
     pod-security.kubernetes.io/warn: privileged
+    pod-security.kubernetes.io/warn-version: latest
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -28,6 +31,9 @@ spec:
       serviceAccountName: fluent-bit
       hostNetwork: false
       dnsPolicy: ClusterFirst
+      securityContext:
+        runAsUser: 0
+        fsGroup: 0
       containers:
       - name: fluent-bit
         image: cr.fluentbit.io/fluent/fluent-bit:2.1.4
@@ -35,6 +41,7 @@ spec:
         securityContext:
           privileged: true
           runAsUser: 0
+          allowPrivilegeEscalation: true
         volumeMounts:
         - name: varlog
           mountPath: /var/log
