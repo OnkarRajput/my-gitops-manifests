@@ -17,4 +17,4 @@ spec:
       - name: web-container
         image: docker.io/placeholder/devsecops-app:latest
         ports:
-        - containerPort: 80
+        - containerPort: 9999
