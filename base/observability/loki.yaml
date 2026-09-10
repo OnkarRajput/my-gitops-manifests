@@ -12,15 +12,6 @@ data:
     common:
       path_prefix: /loki
       replication_factor: 1
-      storage:
-        s3:
-          s3: null
-          endpoint: null
-          region: null
-          access_key_id: null
-          secret_access_key: null
-        filesystem:
-          directory: /loki/chunks
     
     ingester:
       chunk_idle_period: 3m
@@ -56,7 +47,6 @@ data:
     compactor:
       working_directory: /loki/compactor
       compaction_interval: 10m
-      shared_store: filesystem
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
